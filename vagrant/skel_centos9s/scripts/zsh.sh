@@ -6,11 +6,11 @@ echo "vagrant ALL=(ALL:ALL) NOPASSWD: /usr/bin/chsh" | sudo EDITOR='tee -a' visu
 # Set Zsh as the default shell for the vagrant user
 sudo chsh -s $(which zsh) vagrant
 #sudo chsh -s $(/usr/bin/zsh) vagrant
-sudo usermod -s /bin/zsh vagrant
+sudo usermod -s /usr/bin/zsh vagrant
 
 
 # Copy the default .zshrc to the user's home directory
-cp /vagrant/scripts/.zshrc /home/vagrant/
+sudo cp /vagrant/scripts/.zshrc /home/vagrant/
 
 # Change ownership of the .zshrc file to the user
 sudo chown vagrant:vagrant /home/vagrant/.zshrc

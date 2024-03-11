@@ -35,4 +35,5 @@ software:
   #dashboard: 2.7.0
   ansible: true
   docker: true
+  ec2user: true
   os: CentOS_9_Stream

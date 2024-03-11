@@ -5,7 +5,7 @@ sudo yum install -y zsh wget git
 sudo useradd -m -s /bin/zsh ec2-user
     
 # Set password for the user (replace 'password' with your desired password)
-echo "password" | sudo passwd --stdin ec2-user
+echo "welcome" | sudo passwd --stdin ec2-user
     
 # Optionally, you can add the user to the sudoers file
 echo "ec2-user ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/ec2-user
