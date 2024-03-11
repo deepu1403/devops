@@ -1,4 +1,6 @@
 
+ENV['VAGRANT_NO_PARALLEL'] = 'yes'
+
 require "yaml"
 settings = YAML.load_file "settings.yaml"
 
@@ -11,23 +13,32 @@ NUM_WORKER_NODES = settings["nodes"]["workers"]["count"]
 
 Vagrant.configure("2") do |config|
   config.vm.provision "shell", env: { "IP_NW" => IP_NW, "IP_START" => IP_START, "NUM_WORKER_NODES" => NUM_WORKER_NODES }, inline: <<-SHELL
-      apt-get update -y
+      yum update -y
       echo "$IP_NW$((IP_START)) master-node" >> /etc/hosts
       for i in `seq 1 ${NUM_WORKER_NODES}`; do
         echo "$IP_NW$((IP_START+i)) worker-node0${i}" >> /etc/hosts
       done
   SHELL
 
-  if `uname -m`.strip == "aarch64"
-    config.vm.box = settings["software"]["box"] + "-arm64"
-  else
-    config.vm.box = settings["software"]["box"]
-  end
+#   if `uname -m`.strip == "aarch64"
+#     config.vm.box = settings["software"]["box"] + "-arm64"
+#   else
+#     config.vm.box = settings["software"]["box"]
+#   end
   config.vm.box_check_update = true
   config.ssh.insert_key = false
   #config.ssh.private_key_path = "C:/Users/deepu/.ssh/id_rsa"
   #config.vm.boot_timeout = 60
   #config.ssh.debug = { :key_verbose => true }
+
+  #config.ssh.insert_key = false
+  config.vm.synced_folder ".", "/vagrant", create: true
+  #config.ssh.private_key_path = "C:/Users/deepu/.ssh/id_ed25519"
+  #config.ssh.private_key_path = "C:\Users\deepu\.ssh\id_rsa"
+  config.ssh.insert_key = false
+  config.vm.box = "generic/centos9s"
+  config.vm.box_check_update = true
+  
 
   config.vm.define "master" do |master|
     master.vm.hostname = "master-node"

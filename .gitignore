@@ -5,7 +5,7 @@ configs/
 
 # Log files (if you are creating logs in debug mode, uncomment this)
 # *.log
-
+.zsh_history
 
 # Icon must end with two \r
 Icon

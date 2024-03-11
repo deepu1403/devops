@@ -6,7 +6,7 @@ set -euxo pipefail
 
 # Update the system
 echo "[TASK 1] Updating the system"
-yum update -y >/dev/null 2>&1
+#yum update -y 
 
 # Enable password authentication
 echo "[TASK 2] Enabling password authentication in sshd config"
@@ -15,27 +15,33 @@ systemctl reload sshd
 
 # Disable SELinux
 echo "[TASK 3] Disable SELinux"
-setenforce 0
+#sudo echo 0 > /selinux/enforce
+#setenforce 0
+#/usr/sbin/setenforce 0
 sed -i --follow-symlinks 's/^SELINUX=enforcing/SELINUX=disabled/' /etc/sysconfig/selinux
 
 # Disable and stop firewalld
 echo "[TASK 5] Disable and stop firewalld"
-systemctl disable firewalld >/dev/null 2>&1
-systemctl stop firewalld
+sudo systemctl disable firewalld 
+#>/dev/null 2>&1
+sudo systemctl stop firewalld
 
 # Variable Declaration
 
 
 # Install systemd-resolved
 echo "[TASK 6] Install systemd-resolved"
-sudo dnf install -y systemd-resolved >/dev/null 2>&1
+sudo yum install -y systemd-resolved 
+#>/dev/null 2>&1
 
 # Enable and start systemd-resolved
 sudo systemctl enable systemd-resolved
 sudo systemctl start systemd-resolved
 
 # Update /etc/nsswitch.conf
-sudo sed -i '/^hosts:/ s/dns$/dns resolve/' /etc/nsswitch.conf
+#sudo sed -i '/^hosts:/ s/dns$/dns resolve/' /etc/nsswitch.conf
+sudo sed -i '/^hosts:/ s/dns myhostname\( \)*$/dns resolve\1/' /etc/nsswitch.conf
+
 
 # Restart networking
 sudo systemctl restart NetworkManager

@@ -33,6 +33,7 @@ software:
   calico: 3.26.0
   # To skip the dashboard installation, set its version to an empty value or comment it out:
   #dashboard: 2.7.0
-  ansible: true
+#  ansible: true
   docker: true
+  kubernetes: 1.28.2-00
   os: CentOS_9_Stream
