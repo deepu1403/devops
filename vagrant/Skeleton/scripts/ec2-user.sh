@@ -30,13 +30,15 @@ HISTCONTROL=ignoreboth:erasedups
 alias ls='ls --color=auto'
 alias ll='ls -l'
 alias la='ls -la'
+alias shq="fc -ln 0 > /vagrant/scripts/.zsh_history && fc -ln 0 >> ~/.zsh_history"
+alias exit="shq && exit"
 
 # Set PATH variable
 export PATH=$HOME/bin:/usr/local/nvim/bin:$PATH
 export ZSH=~/.zsh
 
 # Enable completion
-autoload -Uz compinit; compinit; _comp_options+=(globdots)
+autoload -Uz compinit; _comp_options+=(globdots)
 
 #allow tab completion in the middle of a word
 setopt COMPLETE_IN_WORD
@@ -71,7 +73,9 @@ colors
 
 # Set prompt format
 PS1="%F{blue}%n@%m %F{green}%~ %F{yellow}%# %f"
-' >> /home/ec2-user/.zshrc
+' > /home/ec2-user/.zshrc
+
+sudo -u ec2-user cp /vagrant/scripts/.zsh_history /home/ec2-user/.zsh_history
 
 # Change ownership of the .zshrc file to the user
 sudo chown ec2-user:ec2-user /home/ec2-user/.zshrc
@@ -95,7 +99,7 @@ sudo -u ec2-user /home/ec2-user/.zsh/plugins/fzf/install --all
 
 #Install Neovim
 curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz 
-sudo tar -xvf nvim-linux64.tar.gz -C /usr/local/
+sudo tar -xvf nvim-linux64.tar.gz -C /usr/local/ >/dev/null 2>&1
 sudo mv /usr/local/nvim-linux64 /usr/local/nvim
 
 #install Lazyvim
