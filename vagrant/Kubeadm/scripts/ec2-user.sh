@@ -1,14 +1,18 @@
 # Install Zsh
-sudo yum install -y zsh wget git
+sudo yum install -y zsh wget git glibc cargo tmux
 
 # Create a new user named ec2-user
 sudo useradd -m -s /usr/bin/zsh ec2-user
+
+#sudo chsh -s $(which zsh) ec2-user
+#sudo chsh -s $(/usr/bin/zsh) ec2-user
     
 # Set password for the user (replace 'password' with your desired password)
-echo "password" | sudo passwd --stdin ec2-user
+echo "welcome" | sudo passwd --stdin ec2-user
     
 # Optionally, you can add the user to the sudoers file
 echo "ec2-user ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/ec2-user
+#echo "vagrant ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/vagrant
 
 # Copy the default .zshrc to the user's home directory
 echo '
@@ -28,7 +32,7 @@ alias ll='ls -l'
 alias la='ls -la'
 
 # Set PATH variable
-export PATH=$HOME/bin:$PATH
+export PATH=$HOME/bin:/usr/local/nvim/bin:$PATH
 export ZSH=~/.zsh
 
 # Enable completion
@@ -88,3 +92,12 @@ echo "source ~/.zsh/plugins/git-prompt.zsh/git-prompt.zsh" >> /home/ec2-user/.zs
 echo "source ~/.zsh/plugins/git-prompt.zsh/examples/pure.zsh" >> ~/.zshrc
 
 sudo -u ec2-user /home/ec2-user/.zsh/plugins/fzf/install --all 
+
+#Install Neovim
+curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz 
+sudo tar -xvf nvim-linux64.tar.gz -C /usr/local/
+sudo mv /usr/local/nvim-linux64 /usr/local/nvim
+
+#install Lazyvim
+sudo rm -rf /home/ec2-user/.config/nvim/.git
+sudo -u ec2-user git clone https://github.com/LazyVim/starter /home/ec2-user/.config/nvim

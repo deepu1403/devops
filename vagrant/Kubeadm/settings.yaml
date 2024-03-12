@@ -9,7 +9,7 @@
 #   NO_PROXY=127.0.0.1,localhost,master-node,node01,node02,node03
 # All IPs/CIDRs should be private and allowed in /etc/vbox/networks.conf.
 network:
-  control_ip: 10.0.0.20
+  control_ip: 10.0.0.30
   dns_servers:
     - 8.8.8.8
     - 1.1.1.1
