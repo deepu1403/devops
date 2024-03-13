@@ -40,5 +40,5 @@ software:
   #jenkins: true
   #docker: true
   ec2user: true
-  #kubernetes: 1.28.2-00
+  #kubernetes: true
   os: CentOS_9_Stream

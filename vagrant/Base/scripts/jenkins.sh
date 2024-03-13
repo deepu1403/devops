@@ -3,7 +3,7 @@
 set -euxo pipefail
 
 # Install Java
-sudo dnf install -q -y java-11-openjdk-devel
+sudo dnf install -q -y java-17-openjdk-devel
 
 # Install Jenkins
 #sudo dnf install -y wget

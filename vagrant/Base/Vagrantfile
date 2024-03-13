@@ -71,7 +71,7 @@ Vagrant.configure("2") do |config|
         },
         path: "scripts/common.sh"
 
-        if settings["software"]["kubernetes"] != ""
+        if settings["software"]["kubernetes"] == true
           master.vm.provision "shell",
               env: {
                 "ENVIRONMENT" => settings["environment"],
@@ -101,6 +101,11 @@ Vagrant.configure("2") do |config|
         if settings["software"]["docker"] == true
           master.vm.provision "shell", path: "scripts/docker.sh"
         end
+
+        if settings["software"]["ec2user"] == true
+          master.vm.provision "shell", path: "scripts/ec2-user.sh"
+        end
+
 
         
     end
@@ -136,7 +141,7 @@ Vagrant.configure("2") do |config|
             path: "scripts/common.sh"
           
             
-            if settings["software"]["kubernetes"] != ""
+            if settings["software"]["kubernetes"] == true
               node.vm.provision "shell",
               env: {
                 "ENVIRONMENT" => settings["environment"],
