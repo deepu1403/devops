@@ -1,3 +1,7 @@
+#!/bin/bash
+#
+set -euxo pipefail
+
 # Check if the environment variable is set
 if [ -n "$ANSIBLE" ]; then
     echo "Installing Ansible Core"

@@ -44,7 +44,7 @@ sudo sed -i '/^hosts:/ s/dns myhostname\( \)*$/dns resolve\1/' /etc/nsswitch.con
 
 
 # Restart networking
-sudo systemctl restart NetworkManager
+sudo systemctl restart NetworkManager jq
 
 # DNS Setting
 if [ ! -d /etc/systemd/resolved.conf.d ]; then
@@ -56,3 +56,9 @@ DNS=${DNS_SERVERS}
 EOF
 
 sudo systemctl restart systemd-resolved
+
+# Create a mount point for tmpfs
+sudo mkdir -p /mnt/tmpfs
+
+# Add an entry to /etc/fstab to mount tmpfs on boot
+echo "tmpfs   /mnt/tmpfs   tmpfs   size=1G   0   0" | sudo tee -a /etc/fstab

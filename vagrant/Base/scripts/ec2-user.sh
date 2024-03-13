@@ -1,3 +1,7 @@
+#!/bin/bash
+#
+set -euxo pipefail
+
 # Install Zsh
 sudo yum install -y zsh wget git glibc cargo tmux
 
