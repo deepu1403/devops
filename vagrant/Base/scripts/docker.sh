@@ -17,7 +17,7 @@ sudo dnf install -y docker-ce docker-ce-cli containerd.io
 sudo systemctl enable --now docker
 
 sudo usermod -aG docker vagrant
-sudo usermod -aG docker ec2-user
+#sudo usermod -aG docker ec2-user
 
 
 sudo systemctl daemon-reload
