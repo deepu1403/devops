@@ -73,7 +73,7 @@ Vagrant.configure("2") do |config|
           master.vm.provision "shell", path: "scripts/ec2-user.sh"
         end
 
-        if settings["software"]["kubernetes"] == true
+        if settings["software"]["kubernetes"] != ""
           master.vm.provision "shell",
               env: {
               "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
@@ -140,7 +140,7 @@ Vagrant.configure("2") do |config|
               node.vm.provision "shell", path: "scripts/ec2-user.sh"
             end
 
-            if settings["software"]["kubernetes"] == true
+            if settings["software"]["kubernetes"] != ""
               node.vm.provision "shell",
               env: {
                 "ENVIRONMENT" => settings["environment"],
