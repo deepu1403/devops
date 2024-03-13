@@ -1,16 +1,12 @@
 #!/bin/bash
-#
+
 set -euxo pipefail
 
-# Check if the environment variable is set
-if [ -n "$ANSIBLE" ]; then
-    echo "Installing Ansible Core"
-    sudo dnf -y install ansible-core
+# Check if Ansible is installed
+if command -v ansible &> /dev/null; then
+    echo "Ansible is already installed."
 else
-    echo "The environment variable MY_ENV_VARIABLE is not set. No action taken."
+    # Install Ansible
+    echo "Installing Ansible"
+    sudo dnf -y install ansible-core  # Use the appropriate package manager (e.g., apt, yum) based on your system
 fi
-
-#ANS_VERSION="$(echo ${ANSIBLE_VERSION} | grep -oE '[0-9]+\.[0-9]+')"
-
-#sudo dnf -y install "ansible-core-${ANS_VERSION}"
-sudo dnf -y install ansible-core

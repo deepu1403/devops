@@ -69,14 +69,12 @@ Vagrant.configure("2") do |config|
         },
         path: "scripts/common.sh"
 
-        if settings["software"]["ec2user"] == true
-          master.vm.provision "shell", path: "scripts/ec2-user.sh"
-        end
+        
 
-        if settings["software"]["kubernetes"] != ""
+        if settings["software"]["kubernetes"]["status"] == true
           master.vm.provision "shell",
               env: {
-              "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
+              "KUBERNETES_VERSION" => settings["software"]["kubernetes"]["version"],
               "ENVIRONMENT" => settings["environment"],
               "OS" => settings["software"]["os"]
               },
@@ -103,6 +101,10 @@ Vagrant.configure("2") do |config|
 
         if settings["software"]["docker"] == true
           master.vm.provision "shell", path: "scripts/docker.sh"
+        end
+
+        if settings["software"]["ec2user"] == true
+          master.vm.provision "shell", path: "scripts/ec2-user.sh"
         end
         
     end
@@ -136,20 +138,22 @@ Vagrant.configure("2") do |config|
               },
             path: "scripts/common.sh"
           
-            if settings["software"]["ec2user"] == true
-              node.vm.provision "shell", path: "scripts/ec2-user.sh"
-            end
+            
 
-            if settings["software"]["kubernetes"] != ""
+            if settings["software"]["kubernetes"]["status"] == true
               node.vm.provision "shell",
               env: {
                 "ENVIRONMENT" => settings["environment"],
-                "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
+                "KUBERNETES_VERSION" => settings["software"]["kubernetes"]["version"],
                 "OS" => settings["software"]["os"]
               },
               path: "scripts/kcommon.sh"
               
               node.vm.provision "shell", path: "scripts/knode.sh"
+
+              if settings["software"]["ec2user"] == true
+                node.vm.provision "shell", path: "scripts/ec2-user.sh"
+              end
 
             end                          
     

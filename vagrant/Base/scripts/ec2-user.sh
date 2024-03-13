@@ -109,3 +109,28 @@ sudo mv /usr/local/nvim-linux64 /usr/local/nvim
 #install Lazyvim
 sudo rm -rf /home/ec2-user/.config/nvim/.git
 sudo -u ec2-user git clone https://github.com/LazyVim/starter /home/ec2-user/.config/nvim
+
+
+# Check if source user's .kube directory exists
+if [ -d "/home/vagrant/.kube" ]; then
+    # Check if destination user's home directory exists
+    if [ -d "/home/ec2-user" ]; then
+        # Copy .kube directory to destination user's home directory
+        sudo cp -r "/home/vagrant/.kube" "/home/ec2-user/"
+        sudo chown -R ec2-user:ec2-user "/home/ec2-user/.kube"
+        echo ".kube directory copied successfully."
+    else
+        echo "Destination user's home directory does not exist."
+    fi
+else
+    echo "Source user's .kube directory does not exist."
+fi
+
+# Check if group docker exists
+if getent group docker &>/dev/null; then
+    sudo usermod -aG docker ec2-user
+    newgrp docker
+else
+    echo "docker group does not exist."
+fi
+
