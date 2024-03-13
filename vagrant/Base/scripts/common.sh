@@ -16,7 +16,7 @@ systemctl reload sshd
 # Disable SELinux
 echo "[TASK 3] Disable SELinux"
 #sudo echo 0 > /selinux/enforce
-#setenforce 0
+sudo setenforce 0
 #/usr/sbin/setenforce 0
 sed -i --follow-symlinks 's/^SELINUX=enforcing/SELINUX=disabled/' /etc/sysconfig/selinux
 
@@ -31,7 +31,7 @@ sudo systemctl stop firewalld
 
 # Install systemd-resolved
 echo "[TASK 6] Install systemd-resolved"
-sudo yum install -y systemd-resolved 
+sudo yum install -y systemd-resolved jq
 #>/dev/null 2>&1
 
 # Enable and start systemd-resolved
@@ -44,7 +44,7 @@ sudo sed -i '/^hosts:/ s/dns myhostname\( \)*$/dns resolve\1/' /etc/nsswitch.con
 
 
 # Restart networking
-sudo systemctl restart NetworkManager jq
+sudo systemctl restart NetworkManager 
 
 # DNS Setting
 if [ ! -d /etc/systemd/resolved.conf.d ]; then

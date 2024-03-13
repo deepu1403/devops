@@ -11,16 +11,20 @@ IP_SECTIONS = settings["network"]["control_ip"].match(/^([0-9.]+\.)([^.]+)$/)
 IP_NW = IP_SECTIONS.captures[0]
 # Last octet excluding all dots:
 IP_START = Integer(IP_SECTIONS.captures[1])
-if settings["nodes"] == true
+
+CONTROL = settings["nodes"]["control"]["name"]
+WORKER = settings["nodes"]["workers"]["name"]
+
+if settings["nodes"]["workers"]["status"] == true
   NUM_WORKER_NODES = settings["nodes"]["workers"]["count"]
 end
 
 Vagrant.configure("2") do |config|
-  config.vm.provision "shell", env: { "IP_NW" => IP_NW, "IP_START" => IP_START }, inline: <<-SHELL
+  config.vm.provision "shell", env: { "IP_NW" => IP_NW, "IP_START" => IP_START, "CONTROL" => CONTROL,"WORKER" => WORKER }, inline: <<-SHELL
   #sudo dnf update -y
-    echo "$IP_NW$((IP_START)) master" >> /etc/hosts
+    echo "$IP_NW$((IP_START)) $CONTROL" >> /etc/hosts
       for i in `seq 1 ${NUM_WORKER_NODES}`; do
-        echo "$IP_NW$((IP_START+i)) worker0${i}" >> /etc/hosts
+        echo "$IP_NW$((IP_START+i)) $WORKER${i}" >> /etc/hosts
       done
     SHELL
 
@@ -36,7 +40,7 @@ Vagrant.configure("2") do |config|
     
     config.vm.define "master" do |master|
         
-        master.vm.hostname = "master"
+        master.vm.hostname = "#{CONTROL}"
         master.vm.network "private_network", ip: settings["network"]["control_ip"]
             if settings["shared_folders"]
             settings["shared_folders"].each do |shared_folder|
@@ -67,8 +71,23 @@ Vagrant.configure("2") do |config|
         },
         path: "scripts/common.sh"
 
-        if settings["software"]["ec2user"] == true
-          master.vm.provision "shell", path: "scripts/ec2-user.sh"
+        if settings["software"]["kubernetes"] != ""
+          master.vm.provision "shell",
+              env: {
+                "ENVIRONMENT" => settings["environment"],
+                "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
+                "OS" => settings["software"]["os"]
+              },
+              path: "scripts/kcommon.sh"
+
+          master.vm.provision "shell",
+              env: {
+                "CALICO_VERSION" => settings["software"]["calico"],
+                "CONTROL_IP" => settings["network"]["control_ip"],
+                "POD_CIDR" => settings["network"]["pod_cidr"],
+                "SERVICE_CIDR" => settings["network"]["service_cidr"]
+              },
+              path: "scripts/kmaster.sh"
         end
     
         if settings["software"]["jenkins"] == true
@@ -87,12 +106,13 @@ Vagrant.configure("2") do |config|
     end
 
 
-    if settings["nodes"] == true
+    if settings["nodes"]["workers"]["status"] == true
       (1..NUM_WORKER_NODES).each do |i|
 
         config.vm.define "node0#{i}" do |node|
           node.ssh.insert_key = false
-          node.vm.hostname = "worker0#{i}"
+          node.vm.hostname = "#{WORKER}#{i}"
+          #node.vm.hostname = "worker0#{i}"
           node.vm.network "private_network", ip: IP_NW + "#{IP_START + i}"
           if settings["shared_folders"]
             settings["shared_folders"].each do |shared_folder|
@@ -107,16 +127,30 @@ Vagrant.configure("2") do |config|
                 vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
               end
           end
-          node.vm.provision "shell",
-            env: {
-              "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
-              "ENVIRONMENT" => settings["environment"],
-              "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
-              "OS" => settings["software"]["os"]
-            },
+            
+            node.vm.provision "shell",
+              env: {
+                "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
+                "ENVIRONMENT" => settings["environment"],
+              },
             path: "scripts/common.sh"
-          node.vm.provision "shell", path: "scripts/node.sh"
           
+            
+            if settings["software"]["kubernetes"] != ""
+              node.vm.provision "shell",
+              env: {
+                "ENVIRONMENT" => settings["environment"],
+                "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
+                "OS" => settings["software"]["os"]
+              },
+              path: "scripts/kcommon.sh"
+              
+              node.vm.provision "shell", path: "scripts/knode.sh"
+
+            end
+          
+            
+            
     
           # Only install the dashboard after provisioning the last worker (and when enabled).
           if i == NUM_WORKER_NODES and settings["software"]["dashboard"] and settings["software"]["dashboard"] != ""

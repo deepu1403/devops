@@ -8,7 +8,7 @@ sudo dnf install -q -y java-11-openjdk-devel
 # Install Jenkins
 #sudo dnf install -y wget
 sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
-sudo rpm --import import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 sudo dnf install -q -y jenkins
 
 # Start Jenkins service
