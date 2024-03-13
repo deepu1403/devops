@@ -30,7 +30,7 @@ systemctl stop firewalld
 
 # Install systemd-resolved
 echo "[TASK 6] Install systemd-resolved"
-sudo yum install -y systemd-resolved 
+sudo yum install -y systemd-resolved jq
 #>/dev/null 2>&1
 
 # Enable and start systemd-resolved

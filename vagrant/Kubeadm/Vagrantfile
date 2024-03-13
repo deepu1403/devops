@@ -1,3 +1,5 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
 
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
@@ -13,10 +15,9 @@ NUM_WORKER_NODES = settings["nodes"]["workers"]["count"]
 
 Vagrant.configure("2") do |config|
   config.vm.provision "shell", env: { "IP_NW" => IP_NW, "IP_START" => IP_START, "NUM_WORKER_NODES" => NUM_WORKER_NODES }, inline: <<-SHELL
-      yum update -y
-      echo "$IP_NW$((IP_START)) master-node" >> /etc/hosts
+      echo "$IP_NW$((IP_START)) kmaster" >> /etc/hosts
       for i in `seq 1 ${NUM_WORKER_NODES}`; do
-        echo "$IP_NW$((IP_START+i)) worker-node0${i}" >> /etc/hosts
+        echo "$IP_NW$((IP_START+i)) kworker0${i}" >> /etc/hosts
       done
   SHELL
 
@@ -42,8 +43,7 @@ Vagrant.configure("2") do |config|
   
 
   config.vm.define "master" do |master|
-    master.vm.hostname = "master-node"
-    master.ssh.insert_key = false
+    master.vm.hostname = "kmaster"
     master.vm.network "private_network", ip: settings["network"]["control_ip"]
     if settings["shared_folders"]
       settings["shared_folders"].each do |shared_folder|
@@ -51,11 +51,13 @@ Vagrant.configure("2") do |config|
       end
     end
     master.vm.provider "virtualbox" do |vb|
-        #vb.disksize.size = "10GB"
+        vb.name = master.vm.hostname
         vb.cpus = settings["nodes"]["control"]["cpu"]
         vb.memory = settings["nodes"]["control"]["memory"]
         if settings["cluster_name"] and settings["cluster_name"] != ""
           vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
+          vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+          vb.customize ["modifyvm", :id, "--ioapic", "on"]
         end
     end
     master.vm.provision "shell",
@@ -74,13 +76,17 @@ Vagrant.configure("2") do |config|
         "SERVICE_CIDR" => settings["network"]["service_cidr"]
       },
       path: "scripts/master.sh"
+
+      if settings["software"]["ec2user"] == true
+        master.vm.provision "shell", path: "scripts/ec2-user.sh"
+      end
+
   end
 
   (1..NUM_WORKER_NODES).each do |i|
 
     config.vm.define "node0#{i}" do |node|
-      node.ssh.insert_key = false
-      node.vm.hostname = "worker-node0#{i}"
+      node.vm.hostname = "kworker0#{i}"
       node.vm.network "private_network", ip: IP_NW + "#{IP_START + i}"
       if settings["shared_folders"]
         settings["shared_folders"].each do |shared_folder|
@@ -88,10 +94,13 @@ Vagrant.configure("2") do |config|
         end
       end
       node.vm.provider "virtualbox" do |vb|
+          vb.name = node.vm.hostname
           vb.cpus = settings["nodes"]["workers"]["cpu"]
           vb.memory = settings["nodes"]["workers"]["memory"]
           if settings["cluster_name"] and settings["cluster_name"] != ""
             vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
+            vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+            vb.customize ["modifyvm", :id, "--ioapic", "on"]
           end
       end
       node.vm.provision "shell",
@@ -109,11 +118,14 @@ Vagrant.configure("2") do |config|
       if i == NUM_WORKER_NODES and settings["software"]["dashboard"] and settings["software"]["dashboard"] != ""
         node.vm.provision "shell", path: "scripts/dashboard.sh"
       end
+
+      if settings["software"]["ec2user"] == true
+        node.vm.provision "shell", path: "scripts/ec2-user.sh"
+      end
+
     end
 
     
   end
-  #config.ssh.insert_key = false
-  config.vm.provision "shell", path: "scripts/ec2-user.sh" #, privileged: false
-  
+   
 end 
