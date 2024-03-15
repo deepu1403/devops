@@ -127,7 +127,7 @@ else
 fi
 
 # Check if group docker exists
-if getent group docker &>/dev/null; then
+if getent group docker >/dev/null 2>&1; then
     sudo usermod -aG docker ec2-user
     newgrp docker
 else

@@ -37,9 +37,9 @@ software:
   # To skip the dashboard installation, set its version to an empty value or comment it out:
   #dashboard: 2.7.0
 #  ansible: true
-  #jenkins: true
+  jenkins: true
 #  docker: true
-  ec2user: true
+#  ec2user: true
   kubernetes:
 #    status: true
     version: 1.28.2-00

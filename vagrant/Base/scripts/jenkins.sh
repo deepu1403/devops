@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-set -euxo pipefail
+#set -euxo pipefail
 
 # Install Java
 sudo dnf install -q -y java-17-openjdk-devel
@@ -12,9 +12,11 @@ sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 sudo dnf install -q -y jenkins
 
 # Start Jenkins service
-sudo systemctl start jenkins
-sudo systemctl enable jenkins
-      
+#sudo systemctl start jenkins
+#sudo systemctl enable jenkins
+sudo systemctl enable --now jenkins
+
+
 # wait for initialization to finish.
 bash -c 'while [ ! -f "/var/lib/jenkins/secrets/initialAdminPassword" ]; do sleep 1; done'
      
