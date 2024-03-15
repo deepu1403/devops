@@ -15,10 +15,27 @@ systemctl reload sshd
 
 # Disable SELinux
 echo "[TASK 3] Disable SELinux"
-#sudo echo 0 > /selinux/enforce
-sudo setenforce 0
-#/usr/sbin/setenforce 0
+# Check if SELinux is currently enabled
+status=$(getenforce)
+
+if [ "$status" == "Enforcing" ]; then
+    echo "SELinux is currently enabled."
+    echo "Disabling SELinux..."
+    sudo setenforce 0
+    echo "SELinux has been disabled."
+elif [ "$status" == "Permissive" ]; then
+    echo "SELinux is currently in permissive mode."
+    echo "No action required."
+else
+    echo "SELinux is already disabled or in an unknown state."
+fi
 sed -i --follow-symlinks 's/^SELINUX=enforcing/SELINUX=disabled/' /etc/sysconfig/selinux
+
+
+# #sudo echo 0 > /selinux/enforce
+# sudo setenforce 0
+# #/usr/sbin/setenforce 0
+# sed -i --follow-symlinks 's/^SELINUX=enforcing/SELINUX=disabled/' /etc/sysconfig/selinux
 
 # Disable and stop firewalld
 echo "[TASK 5] Disable and stop firewalld"
