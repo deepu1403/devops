@@ -11,8 +11,8 @@
 	<properties>
 		<docker.image.prefix>kammana</docker.image.prefix>
 		<sonar.host.url>http://18.181.164.81:9000/</sonar.host.url>
-<maven.compiler.target>1.8</maven.compiler.target>
-  <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
 	</properties>
 	<dependencies>
 
@@ -46,5 +46,17 @@
 	    </pluginRepository>
 	</pluginRepositories>
 
+<plugin>
+   <groupId>net.alchim31.maven</groupId>
+    <artifactId>yuicompressor-maven-plugin</artifactId>
+    <version>1.5.1</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>compress</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
 	
 </project>
